@@ -1,5 +1,5 @@
-const { Photo, Album, AlbumActivity } = require('../models/associations');
-const logger = require('../config/logger');
+const { Photo, Album, AlbumActivity } = require('../../models/associations');
+const logger = require('../../config/logger');
 const fs = require('fs');
 const path = require('path');
 const { Op } = require('sequelize');

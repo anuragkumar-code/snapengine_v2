@@ -1,8 +1,8 @@
-const authService = require('../services/auth/authService');
-const logger = require('../config/logger');
+const authService = require('../../services/auth/authService');
+const logger = require('../../config/logger');
 
 class AuthController {
-  async register(req, res) {
+  async register(req, res) { 
     try {
       const result = await authService.registerUser(req.body);
       res.status(201).json(result);
