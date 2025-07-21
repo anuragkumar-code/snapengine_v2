@@ -8,6 +8,7 @@ const passport = require('./config/passport');
 const routes = require('./routes');
 const logger = require('./config/logger');
 const { checkDatabaseConnection, syncDatabase } = require('./utils/healthCheck');
+const path = require('path');
 
 const app = express();
 
@@ -43,6 +44,9 @@ app.use(morgan('combined', {
 
 // Passport middleware
 app.use(passport.initialize());
+
+// Serve uploads directory as static files
+app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 
 // Routes
 app.use('/api', routes);
