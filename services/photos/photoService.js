@@ -16,10 +16,12 @@ class PhotoService {
       let totalSize = 0;
 
       for (const file of files) {
+        const relativePath = path.relative(path.join(__dirname, '../../'), file.path);
+        const publicPath = relativePath.replace(/^src\//, '');
         const photo = await Photo.create({
           filename: file.filename,
           original_name: file.originalname,
-          file_path: file.path,
+          file_path: publicPath, 
           file_size: file.size,
           mime_type: file.mimetype,
           caption: photoData.caption || null,
