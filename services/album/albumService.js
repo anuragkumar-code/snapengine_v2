@@ -269,9 +269,16 @@ class AlbumService {
       });
 
       for (const photo of photos) {
-        // Delete physical file
-        if (fs.existsSync(photo.file_path)) {
-          fs.unlinkSync(photo.file_path);
+        // Delete all image versions
+        const paths = [photo.original_path, photo.medium_path, photo.thumb_path];
+        for (const p of paths) {
+          if (p && fs.existsSync(p)) {
+            try {
+              fs.unlinkSync(p);
+            } catch (err) {
+              logger.warn(`Failed to delete file: ${p}`);
+            }
+          }
         }
       }
 

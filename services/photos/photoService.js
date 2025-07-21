@@ -5,7 +5,7 @@ const path = require('path');
 const { Op } = require('sequelize');
 
 class PhotoService {
-  async addPhotos(albumId, userId, files, photoData = {}) {
+  async addPhotos(albumId, userId, files, photoData = {}, processedFiles = []) {
     try {
       const album = await Album.findByPk(albumId);
       if (!album) {
@@ -15,13 +15,17 @@ class PhotoService {
       const photos = [];
       let totalSize = 0;
 
+      // Use processedFiles from processImage middleware
       for (const file of files) {
-        const relativePath = path.relative(path.join(__dirname, '../../'), file.path);
-        const publicPath = relativePath.replace(/^src\//, '');
+        // Find the processed file info by filename
+        const processed = (Array.isArray(processedFiles) ? processedFiles : []).find(f => f.filename === file.filename);
+        if (!processed) continue;
         const photo = await Photo.create({
           filename: file.filename,
           original_name: file.originalname,
-          file_path: publicPath, 
+          original_path: processed.original_path,
+          medium_path: processed.medium_path,
+          thumb_path: processed.thumb_path,
           file_size: file.size,
           mime_type: file.mimetype,
           caption: photoData.caption || null,
@@ -31,7 +35,6 @@ class PhotoService {
           user_id: userId,
           order_index: await this.getNextOrderIndex(albumId)
         });
-
         photos.push(photo);
         totalSize += file.size;
       }
@@ -42,7 +45,7 @@ class PhotoService {
 
       // Set first photo as cover if no cover exists
       if (!album.cover_photo && photos.length > 0) {
-        await album.update({ cover_photo: photos[0].file_path });
+        await album.update({ cover_photo: photos[0].original_path });
         await photos[0].update({ is_cover: true });
       }
 
@@ -56,9 +59,26 @@ class PhotoService {
 
       logger.info(`Photos added: ${photos.length} to album: ${albumId} by user: ${userId}`);
 
+      // Prepare full URLs for each version
+      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const photosWithUrls = photos.map(photo => ({
+        id: photo.id,
+        filename: photo.filename,
+        original_url: `${baseUrl}/${photo.original_path}`,
+        medium_url: `${baseUrl}/${photo.medium_path}`,
+        thumb_url: `${baseUrl}/${photo.thumb_path}`,
+        caption: photo.caption,
+        tags: photo.tags,
+        is_private: photo.is_private,
+        album_id: photo.album_id,
+        user_id: photo.user_id,
+        created_at: photo.createdAt,
+        updated_at: photo.updatedAt
+      }));
+
       return {
         success: true,
-        data: photos,
+        data: photosWithUrls,
         message: 'Photos added successfully'
       };
     } catch (error) {
@@ -125,12 +145,15 @@ class PhotoService {
         throw new Error('You do not have permission to delete this photo');
       }
 
-      // Delete physical file
-      if (fs.existsSync(photo.file_path)) {
-        try {
-          fs.unlinkSync(photo.file_path);
-        } catch (err) {
-          logger.warn(`Failed to delete file: ${photo.file_path}`);
+      // Delete all image versions
+      const paths = [photo.original_path, photo.medium_path, photo.thumb_path];
+      for (const p of paths) {
+        if (p && fs.existsSync(p)) {
+          try {
+            fs.unlinkSync(p);
+          } catch (err) {
+            logger.warn(`Failed to delete file: ${p}`);
+          }
         }
       }
 
@@ -149,7 +172,7 @@ class PhotoService {
         });
         if (nextPhoto) {
           await nextPhoto.update({ is_cover: true });
-          await photo.album.update({ cover_photo: nextPhoto.file_path });
+          await photo.album.update({ cover_photo: nextPhoto.original_path });
         } else {
           await photo.album.update({ cover_photo: null });
         }

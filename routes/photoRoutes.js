@@ -3,11 +3,12 @@ const photoController = require('../controllers/photos/photoController');
 const { authenticate } = require('../middleware/auth');
 const { checkAlbumAccess, requirePermission } = require('../middleware/albumPermissions');
 const upload = require('../middleware/multer');
+const processImage = require('../middleware/processImage');
 
 const router = express.Router();
 
 // Add photos to album (requires can_add)
-router.post('/album/:albumId', authenticate, checkAlbumAccess, requirePermission('can_add'), upload.array('photos', 20), photoController.addPhotos);
+router.post('/album/:albumId', authenticate, checkAlbumAccess, requirePermission('can_add'), upload.array('photos', 20), processImage, photoController.addPhotos);
 // Get all photos in album (requires can_view)
 router.get('/album/:albumId', authenticate, checkAlbumAccess, requirePermission('can_view'), photoController.getAlbumPhotos);
 // Get all user photos

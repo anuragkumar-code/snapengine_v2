@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure upload directory exists
-const uploadDir = path.join(__dirname, '../src/uploads');
+const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -11,7 +11,7 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const albumId = req.params.albumId || 'temp';
-    const userDir = path.join(uploadDir, req.user.id.toString(), albumId);
+    const userDir = path.join(uploadDir, req.user.id.toString(), albumId, 'original');
     
     if (!fs.existsSync(userDir)) {
       fs.mkdirSync(userDir, { recursive: true });
