@@ -4,7 +4,13 @@ const logger = require('../../config/logger');
 class PhotoController {
   async addPhotos(req, res) {
     try {
-      const result = await photoService.addPhotos(req.params.albumId, req.user.id, req.files, req.body);
+      const result = await photoService.addPhotos(
+        req.params.albumId,
+        req.user.id,
+        req.files,
+        req.body,
+        req.processedFiles 
+      );
       res.status(201).json(result);
     } catch (error) {
       logger.error('Add photos controller error:', error);

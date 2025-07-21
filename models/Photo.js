@@ -15,7 +15,15 @@ const Photo = sequelize.define('Photo', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  file_path: {
+  original_path: {
+    type: DataTypes.STRING(500),
+    allowNull: false
+  },
+  medium_path: {
+    type: DataTypes.STRING(500),
+    allowNull: false
+  },
+  thumb_path: {
     type: DataTypes.STRING(500),
     allowNull: false
   },

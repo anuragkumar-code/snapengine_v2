@@ -12,9 +12,22 @@ const checkDatabaseConnection = async () => {
   }
 };
 
+// const syncDatabase = async () => {
+//   try {
+//     await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+//     logger.info('Database synchronized successfully');
+//     return true;
+//   } catch (error) {
+//     logger.error('Database synchronization failed:', error);
+//     return false;
+//   }
+// };
+
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    if (process.env.NODE_ENV === 'development') {
+      await sequelize.sync(); 
+    }
     logger.info('Database synchronized successfully');
     return true;
   } catch (error) {
@@ -22,6 +35,7 @@ const syncDatabase = async () => {
     return false;
   }
 };
+
 
 module.exports = {
   checkDatabaseConnection,
