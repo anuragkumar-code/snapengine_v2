@@ -40,7 +40,7 @@ const Album = sequelize.define('Album', {
     }
   },
   cover_photo: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.TEXT,
     allowNull: true
   },
   type: {
@@ -48,7 +48,7 @@ const Album = sequelize.define('Album', {
     defaultValue: 'personal'
   },
   location: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.TEXT,
     allowNull: true
   },
   privacy_settings: {

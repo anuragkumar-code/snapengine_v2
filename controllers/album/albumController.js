@@ -4,7 +4,12 @@ const logger = require('../../config/logger');
 class AlbumController {
   async createAlbum(req, res) {
     try {
-      const result = await albumService.createAlbum(req.user.id, req.body);
+      const albumData = {
+        ...req.body,
+        cover_photo: req.file ? req.file.path.replace(/\\/g, '/') : null
+      };
+
+      const result = await albumService.createAlbum(req.user.id, albumData);
       res.status(201).json(result);
     } catch (error) {
       logger.error('Create album controller error:', error);
