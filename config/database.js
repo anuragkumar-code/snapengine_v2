@@ -8,7 +8,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mysql',
+    dialect: 'postgres', 
     logging: (msg) => logger.info(msg),
     pool: {
       max: 10,
@@ -19,7 +19,7 @@ const sequelize = new Sequelize(
     define: {
       timestamps: true,
       underscored: true,
-      paranoid: true // Soft delete
+      paranoid: true 
     }
   }
 );
