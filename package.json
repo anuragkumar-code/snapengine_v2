@@ -1,7 +1,7 @@
 {
   "name": "snapengine_v2",
   "version": "1.0.0",
-  "description": "Social media photo album backend with authentication",
+  "description": "Social media photo album backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

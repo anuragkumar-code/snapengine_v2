@@ -2,11 +2,12 @@ const express = require('express');
 const albumController = require('../controllers/album/albumController');
 const { authenticate } = require('../middleware/auth');
 const { checkAlbumOwnership, checkAlbumAccess, requirePermission } = require('../middleware/albumPermissions');
+const uploadCoverPhoto = require('../middleware/coverUpload');
 
 const router = express.Router();
 
 // Create album
-router.post('/', authenticate, albumController.createAlbum);
+router.post('/', authenticate, uploadCoverPhoto.single('cover_photo'), albumController.createAlbum);
 // Get all albums for user
 router.get('/', authenticate, albumController.getUserAlbums);
 // Get all shared albums for user
