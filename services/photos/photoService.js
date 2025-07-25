@@ -149,9 +149,9 @@ class PhotoService {
       const paths = [photo.original_path, photo.medium_path, photo.thumb_path];
       for (const p of paths) {
         if (p && fs.existsSync(p)) {
-          try {
+        try {
             fs.unlinkSync(p);
-          } catch (err) {
+        } catch (err) {
             logger.warn(`Failed to delete file: ${p}`);
           }
         }
